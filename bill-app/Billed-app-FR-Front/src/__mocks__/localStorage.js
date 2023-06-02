@@ -8,7 +8,8 @@ export const localStorageMock = (function() {
       store[key] = value.toString()
     },
     clear: function() {
-      store = {}
+     // store = {}
+     store = mockedBills;
     },
     removeItem: function(key) {
       delete store[key]

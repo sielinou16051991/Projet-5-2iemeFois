@@ -19,8 +19,17 @@ const row = (bill) => {
     `)
   }
 
+// const rows = (data) => {
+ // return (data && data.length) ? data.map(bill => row(bill)).join("") : ""
+  
+// }
 const rows = (data) => {
-  return (data && data.length) ? data.map(bill => row(bill)).join("") : ""
+  if(data && data.length) {
+    const antiChrono = (a, b) => ((a.date < b.date) ? 1 : -1)
+    const datesSorted = [...data].sort(antiChrono)
+    return datesSorted.map(bill => row(bill)).join("")
+  }
+  return ""
 }
 
 export default ({ data: bills, loading, error }) => {

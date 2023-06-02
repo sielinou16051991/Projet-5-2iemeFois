@@ -1,5 +1,6 @@
 
 const jsonOrThrowIfError = async (response) => {
+  console.log(response);
   if(!response.ok) throw new Error((await response.json()).message)
   return response.json()
 }
