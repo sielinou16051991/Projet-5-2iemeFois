@@ -161,7 +161,7 @@ describe('Given I a user connected as employee', () => {
       router();
     });
 
-  test("L'appel d'API échou avec une erreur 404", async () => {
+  test("fetches bills from an API and fails with 404 message error", async () => {
     // Les factures fictives (simulé ci-dessus) fonctionnent avec une promesse rejetée
     mockStore.bills.mockImplementationOnce(() => {
       return {
@@ -179,7 +179,7 @@ describe('Given I a user connected as employee', () => {
     expect(message).toBeTruthy();
   })
 
-  test("l'appel d'API échou avec une erreur 500", async () => {
+  test("fetches bills from an API and fails with 500 message error", async () => {
     mockStore.bills.mockImplementationOnce(() => {
       return {
         list: () => {
