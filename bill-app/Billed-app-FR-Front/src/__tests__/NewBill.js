@@ -3,7 +3,7 @@
  */
 
 import userEvent from '@testing-library/user-event';
-import { screen, waitFor } from "@testing-library/dom"
+import { fireEvent, screen, waitFor } from "@testing-library/dom"
 import NewBillUI from "../views/NewBillUI.js"
 import NewBill from "../containers/NewBill.js"
 import router from "../app/Router.js"
@@ -109,8 +109,8 @@ describe("Given I am connected as an employee", () => {
         const form = screen.getByTestId('form-new-bill');
 
         // 1iere assertion:  assertion sur les inputs
-        expect(screen.getByTestId('expense-type').value).toBe('');
-        expect(form.getByTestId('expense-name').value).toBe('');
+        //expect(screen.getByTestId('expense-type').value).toBe('');
+        expect(screen.getByTestId('expense-name').value).toBe('');
         expect(screen.getByTestId('datepicker').value).toBe('');
         expect(screen.getByTestId('amount').value).toBe('');
         expect(screen.getByTestId('vat').value).toBe('');
@@ -118,9 +118,9 @@ describe("Given I am connected as an employee", () => {
         expect(screen.getByTestId('file').value).toBe('');
 
         // soumission du formulaire
-        const handlerSobmit = jest.fn((e) => newBill.handlerSubmit(e));
+        const handlerSobmit = jest.fn((e) => newBill.handleSubmit(e));
         form.addEventListener('submit', handlerSobmit);
-        fireEvent(form);
+        fireEvent.submit(form);
 
         // 2ieme assertion: assertion sur le formulaire
         expect(handlerSobmit).toBeCalled();

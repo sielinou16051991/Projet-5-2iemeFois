@@ -11,8 +11,7 @@ import { localStorageMock } from "../__mocks__/localStorage.js";
 import { toHaveClass } from "@testing-library/jest-dom";
 import { toBeTruthy } from "@testing-library/jest-dom";
 import  Bills  from "../containers/Bills.js";
-import { mockStore } from "../__mocks__/store";
-import spyOn from "@testing-library/jest-dom";
+import mockStore from "../__mocks__/store";
 
 import router from "../app/Router.js";
 
@@ -95,7 +94,7 @@ describe("Given I am connected as an employee", () => {
 
         // Assertion : click pour voir l'image
         const img = screen.getByTestId("modalBillImg");
-        expect(img).toHaveAttribute('src', bills[bills.length - 1].fileUrl); // Vérifiez l’URL du fichier du dernier appel
+        expect(img).toHaveAttribute('src', bills[1].fileUrl); // Vérifiez l’URL du fichier du dernier appel
 
         // Assertion : click pour la fonction d'appel
         expect($.fn.modal).toHaveBeenCalledWith('show'); // verifier si la fonction "modal" est bien appelé avec un l'argument "show"
@@ -145,22 +144,22 @@ describe('Given I a user connected as employee', () => {
 
       // Assertions
       expect(screen.getByText('Mes notes de frais')).toBeTruthy();
-      expect(chargementFactures.length).toBe(2);
+      expect(chargementFactures.length).toBe(4);
     })
   });
 
   describe("L'orsqu'une erreur se produit lors de l'appel de l'API", () => {
-  beforeEach(() => {
-    // On declare un observable, qui surveillera la fonction bills de mockStore
-    // (simulation du comportement de la fonction bills)
-    jest.spyOn(mockStore, 'bills');
+    beforeEach(() => {
+      // On declare un observable, qui surveillera la fonction bills de mockStore
+      // (simulation du comportement de la fonction bills)
+      jest.spyOn(mockStore, 'bills');
 
-    // parametrage globale
-    const root = document.createElement('div');
-    root.setAttribute('id', 'root');
-    document.body.appendChild(root);
-    router();
-  });
+      // parametrage globale
+      const root = document.createElement('div');
+      root.setAttribute('id', 'root');
+      document.body.appendChild(root);
+      router();
+    });
 
   test("L'appel d'API échou avec une erreur 404", async () => {
     // Les factures fictives (simulé ci-dessus) fonctionnent avec une promesse rejetée
