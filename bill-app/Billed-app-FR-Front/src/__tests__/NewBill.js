@@ -2,13 +2,15 @@
  * @jest-environment jsdom
  */
 
+import userEvent from '@testing-library/user-event';
 import { screen, waitFor } from "@testing-library/dom"
 import NewBillUI from "../views/NewBillUI.js"
 import NewBill from "../containers/NewBill.js"
 import router from "../app/Router.js"
 import { ROUTES, ROUTES_PATH} from "../constants/routes.js"
 import {localStorageMock} from "../__mocks__/localStorage.js"
-import { toHaveClass } from "@testing-library/jest-dom"
+import { toHaveClass } from "@testing-library/jest-dom";
+import mockStore from "../__mocks__/store";
 
 const onNavigate = (pathname) => { document.body.innerHTML = ROUTES({ pathname})}
 describe("Given I am connected as an employee", () => {
@@ -42,7 +44,7 @@ describe("Given I am connected as an employee", () => {
       test('then red error message show', async () => {
 
         document.body.innerHTML = NewBillUI();
-        const nexBill = new NewBill({ document, onNavigate, localStorage: window.localStorage });
+        const newBill = new NewBill({ document, onNavigate, localStorage: window.localStorage });
         const inputFile = screen.getByTestId('file');
         const errorMessageFile = screen.getByTestId('error-message-file');
 
@@ -50,7 +52,7 @@ describe("Given I am connected as an employee", () => {
         const loardFile = new File(['test-file'], 'test-file.txt', {type: 'text/plain'});
 
         // Action de chargement du fichier
-        const handleChangeFile = jest.fn((e) => NewBill.handleChangeFile(e));
+        const handleChangeFile = jest.fn((e) => newBill.handleChangeFile(e));
         inputFile.addEventListener('change', handleChangeFile);
         userEvent.upload(inputFile, loardFile);
 
@@ -68,15 +70,15 @@ describe("Given I am connected as an employee", () => {
 
     describe('When I uploade a file with the good format', () => {
 
-      test('Then it should display the file name and hede the error message', async () => {
+      test('Then it should display the file name and hide the error message', async () => {
 
         // Paramettrage 
-        document.innerHTML = NewBillUI();
-        const newBill = new NewBillUI({ document, onNavigate, store: mockStore, localStorage: window.localStorage });
+        document.body.innerHTML = NewBillUI();
+        const newBill = new NewBill({ document, onNavigate, store: mockStore, localStorage: window.localStorage });
         const inputFile = screen.getByTestId('file');
 
         // Paramettrage pour le format de données qui doit etre chargé
-        const formatGoodFile = new File(['fichier'], 'fichier.jpeg', {thype: 'image/jpeg'});
+        const formatGoodFile = new File(['test-file'], 'test-file.png', { type: 'image/png' });
         
         // Action: simulation du comportement de la fonction handleSChange de NewBill
         // ( chargement d'un fichier apartir d'un évennement)
@@ -86,8 +88,8 @@ describe("Given I am connected as an employee", () => {
 
         // Assert
         expect(handleChangeFile).toBeCalled();
-        expect(inputFile.files[0].name).toBe('fichier.jpeg');
-        expect(inputFile.files[0].type).toBe('image/jpeg');
+        expect(inputFile.files[0].name).toBe('test-file.png');
+        expect(inputFile.files[0].type).toBe('image/png');
         expect(inputFile.files[0]).toStrictEqual(formatGoodFile);
         
         // Assertion error message
@@ -116,7 +118,7 @@ describe("Given I am connected as an employee", () => {
         expect(screen.getByTestId('file').value).toBe('');
 
         // soumission du formulaire
-        const handlerSobmit = jest.fn((e) => newBill.handlerSobmit(e));
+        const handlerSobmit = jest.fn((e) => newBill.handlerSubmit(e));
         form.addEventListener('submit', handlerSobmit);
         fireEvent(form);
 

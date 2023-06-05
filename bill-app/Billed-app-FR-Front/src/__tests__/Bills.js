@@ -2,20 +2,23 @@
  * @jest-environment jsdom
  */
 
+import userEvent from '@testing-library/user-event';
 import {screen, waitFor} from "@testing-library/dom";
 import BillsUI from "../views/BillsUI.js";
 import { bills } from "../fixtures/bills.js";
-import { ROUTES, ROUTES_PATH} from "../constants/routes.js";
-import {localStorageMock} from "../__mocks__/localStorage.js";
+import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
+import { localStorageMock } from "../__mocks__/localStorage.js";
 import { toHaveClass } from "@testing-library/jest-dom";
 import { toBeTruthy } from "@testing-library/jest-dom";
-import { Bills } from "../containers/Bills.js";
+import  Bills  from "../containers/Bills.js";
+import { mockStore } from "../__mocks__/store";
+import spyOn from "@testing-library/jest-dom";
 
 import router from "../app/Router.js";
 
-jest.mock("../app/Store", () => {});
+jest.mock("../app/Store", () => mockStore);
 
-const onNavigate = (pathname) => { document.body.innerHTML = ROUTES( {pathname: pathname} ); };
+const onNavigate = (pathname) => { document.body.innerHTML = ROUTES({ pathname }) }
 // ----------------- TEST UNITAIRE --------------------------------
 describe("Given I am connected as an employee", () => {
   // definition de l'employee comme utilisateur courant
@@ -26,10 +29,12 @@ describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
     
     test("Then bill icon in vertical layout should be highlighted", async () => {
+     // document.body.innerHTML = BillsUI({ data: bills });
+     // const billsContainer = new Bills({ document, onNavigate, localStorage: window.localStorage });
 
-      const root = document.createElement("div")
-      root.setAttribute("id", "root")
-      document.body.append(root)
+     const root = document.createElement("div")
+     root.setAttribute("id", "root")
+     document.body.append(root)
 
       // Act
       router()
@@ -75,11 +80,11 @@ describe("Given I am connected as an employee", () => {
         $.fn.modal = jest.fn();
 
         // recupération des éléments
-        const eyeIcons = screen.getElementByAllTestId('icon-eye');
+        const eyeIconTab = screen.getAllByTestId('icon-eye');
         const openModal = jest.fn(billsContainer.handleClickIconEye);
-        const modal = document.getElementById('modaleFile');
+        const modal = screen.getByTestId('modalFileEmployee');
 
-        eyeIcons.forEach((icon) => {
+        eyeIconTab.forEach((icon) => {
           icon.addEventListener('click', (e) => openModal(icon))
           userEvent.click(icon);
         })
@@ -89,22 +94,107 @@ describe("Given I am connected as an employee", () => {
         expect(screen.getByText("Justificatif")).toBeTruthy() // le mot "Justificatif" est bien dans la page html
 
         // Assertion : click pour voir l'image
-        const image = screen.getByTextId("modalBillImg");
-        expect(image).toHaveAttribute('src', bills[bills.length - 1].fileUrl); // Vérifiez l’URL du fichier du dernier appel
+        const img = screen.getByTestId("modalBillImg");
+        expect(img).toHaveAttribute('src', bills[bills.length - 1].fileUrl); // Vérifiez l’URL du fichier du dernier appel
 
         // Assertion : click pour la fonction d'appel
-
         expect($.fn.modal).toHaveBeenCalledWith('show'); // verifier si la fonction "modal" est bien appelé avec un l'argument "show"
-        expect(openModal).toHaveBeenCalledTimes(eyeIcons.length); // la fonction call back de l'evennement a été appelé autant de fois que le nombre de click
+        expect(openModal).toHaveBeenCalledTimes(eyeIconTab.length); // la fonction call back de l'evennement a été appelé autant de fois que le nombre de click
       })
     })
-  })
-})
+
+    describe("When I click on the New Bil Button", () => {
+
+      test("Then It Should open the NewBill Form", () => {
+        // chqrgement des element sur l'interface
+       document.body.innerHTML = BillsUI({data: bills}) 
+       const billContainer = new Bills({document, onNavigate, localStorage: window.localStorage});
+
+       // recuperqtion des elements charger sur l'interface
+       const functionOpenNewBill = jest.fn((e) => billContainer.handleClickNewBill);
+       const btnNewBill = screen.getByTestId("btn-new-bill");
+
+       // Act
+       btnNewBill.addEventListener("click", functionOpenNewBill);
+       userEvent.click(btnNewBill);
+
+       // Assertions
+       expect(functionOpenNewBill).toHaveBeenCalled();
+       expect(screen.getByText('Envoyer une note de frais')).toBeTruthy();
+       expect(screen.getByTestId('form-new-bill')).toBeTruthy();
+      })
+    })
+  }) // fin des tes pour la page bills
+}) // fin des test unitaires du parcour employee
 
 // ----------TEST D'INTEGRATION GET --------
 describe('Given I a user connected as employee', () => {
 
+  beforeAll(() => {
+   Object.defineProperty(window, 'localStorage', {value: localStorageMock});
+   window.localStorage.setItem('user', JSON.stringify({ type: 'Employee', email: 'a@a' }));
+  })
   describe('When I Navigate to Bills Page', () => {
+    test('Then it fetch bills from mock API GET', async () => {
+      document.body.innerHTML = BillsUI({data: bills});
+      const conteneurFactures = new Bills({document, onNavigate, store: mockStore, localStorage: window.localStorage});
+      await waitFor(() => screen.getByText('Mes notes de frais'));
 
+      // Act
+      const chargementFactures = await conteneurFactures.getBills();
+
+      // Assertions
+      expect(screen.getByText('Mes notes de frais')).toBeTruthy();
+      expect(chargementFactures.length).toBe(2);
+    })
   });
+
+  describe("L'orsqu'une erreur se produit lors de l'appel de l'API", () => {
+  beforeEach(() => {
+    // On declare un observable, qui surveillera la fonction bills de mockStore
+    // (simulation du comportement de la fonction bills)
+    jest.spyOn(mockStore, 'bills');
+
+    // parametrage globale
+    const root = document.createElement('div');
+    root.setAttribute('id', 'root');
+    document.body.appendChild(root);
+    router();
+  });
+
+  test("L'appel d'API échou avec une erreur 404", async () => {
+    // Les factures fictives (simulé ci-dessus) fonctionnent avec une promesse rejetée
+    mockStore.bills.mockImplementationOnce(() => {
+      return {
+        list: () => {
+          return Promise.reject(new Error('Erreur 404'))
+        }
+      }
+    });
+
+    // Act
+    window.onNavigate(ROUTES_PATH.Bills);
+    await new Promise(process.nextTick);
+
+    const message = await screen.getByText(/Erreur 404/);
+    expect(message).toBeTruthy();
+  })
+
+  test("l'appel d'API échou avec une erreur 500", async () => {
+    mockStore.bills.mockImplementationOnce(() => {
+      return {
+        list: () => {
+          return Promise.reject(new Error('Erreur 500'));
+        }
+      }
+    });
+
+    // Act
+    window.onNavigate(ROUTES_PATH.Bills);
+    await new Promise(process.nextTick);
+
+    const messages = await screen.getByText(/Erreur 500/);
+    expect(messages).toBeTruthy();
+  })
+  })
 })
