@@ -179,7 +179,7 @@ describe("GIVEN I CONNECTED AS EMPLOYEE ON NEWBILL PAGE", () => {
 
       // Action: soumission du formulaire
       const handleSubmit = jest.fn((e) => newBill.handleSubmit(e));
-      form.addEventListener('submit', handleSubmit);
+      form.addEventListener('submit', (e) => newBill.handleSubmit(e));
       userEvent.click(submitBtn);
 
       // assertions 1 : s'assurer que les fonctions sont appelées
@@ -187,9 +187,11 @@ describe("GIVEN I CONNECTED AS EMPLOYEE ON NEWBILL PAGE", () => {
       expect(newBill.updateBill).toHaveBeenCalled();
       expect(newBill.updateBill).toHaveBeenCalledWith( mockedBill );
       expect(mockStore.bills).toHaveBeenCalled();
+      expect(form).toBeInTheDocument();
 
       // assertion 2: s'assurer qu'on soit retourné a la page Bills
       expect(screen.getByText('Mes notes de frais')).toBeTruthy();
+
     });
   });
 
