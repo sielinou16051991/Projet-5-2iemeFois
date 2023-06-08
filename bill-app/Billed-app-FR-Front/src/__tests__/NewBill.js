@@ -3,7 +3,7 @@
  */
 
 import userEvent from '@testing-library/user-event';
-import { fireEvent, screen, waitFor } from "@testing-library/dom"
+import { fireEvent, screen, waitFor, waitForElement } from "@testing-library/dom"
 import NewBillUI from "../views/NewBillUI.js"
 import NewBill from "../containers/NewBill.js"
 import router from "../app/Router.js"
@@ -179,6 +179,7 @@ describe("GIVEN I CONNECTED AS EMPLOYEE ON NEWBILL PAGE", () => {
 
       // Action: soumission du formulaire
       const handleSubmit = jest.fn((e) => newBill.handleSubmit(e));
+      // await waitForElementVisible(form);
       form.addEventListener('submit', (e) => newBill.handleSubmit(e));
       userEvent.click(submitBtn);
 
