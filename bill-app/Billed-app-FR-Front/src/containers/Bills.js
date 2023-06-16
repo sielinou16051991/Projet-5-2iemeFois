@@ -8,7 +8,25 @@ export default class {
     this.onNavigate = onNavigate
     this.store = store
     const buttonNewBill = document.querySelector(`button[data-testid="btn-new-bill"]`)
-    if (buttonNewBill) buttonNewBill.addEventListener('click', this.handleClickNewBill)
+    if (buttonNewBill) 
+      buttonNewBill.addEventListener('click', this.handleClickNewBill)
+      /*
+    if (buttonNewBill) {
+      buttonNewBill.addEventListener('click', this.handleClickNewBill)
+    } else {
+      console.log("New Bill");
+      // const errorMessageFile = document.querySelector(`button[data-test-id="btn-new-bill-error"]`)
+      // errorMessageFile.style.display = "none";
+      // errorMessageFile.style.color = "red";
+
+      const cible = document.getElementsByClassName('content-header');
+      const errorMessage = document.createElement('div');
+      errorMessage.textContent = 'Le boutton Nouvelle note de frais est abscent';
+      errorMessage.ClassList.add('visible', true);
+      cible.appendChild(errorMessage);
+
+    }
+    */
     const iconEye = document.querySelectorAll(`div[data-testid="icon-eye"]`)
     if (iconEye) iconEye.forEach(icon => {
       icon.addEventListener('click', () => this.handleClickIconEye(icon))

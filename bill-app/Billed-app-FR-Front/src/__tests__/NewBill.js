@@ -11,6 +11,7 @@ import { ROUTES, ROUTES_PATH } from "../constants/routes.js"
 import { localStorageMock } from "../__mocks__/localStorage.js"
 import { toHaveClass } from "@testing-library/jest-dom";
 import mockStore from "../__mocks__/store";
+import mockedBills from "../__mocks__/store";
 
 const onNavigate = (pathname) => { document.body.innerHTML = ROUTES({ pathname }) }
 describe("Given I am connected as an employee", () => {
@@ -145,27 +146,40 @@ describe("GIVEN I CONNECTED AS EMPLOYEE ON NEWBILL PAGE", () => {
   describe("when I click on the submit button and API working", () => {
     test("Then it should send and Mock POST request and return to the bill page", async () => {
 
+      //const root = document.createElement('div');
+      //root.setAttribute('id', 'root');
+      //document.body.append(root);
+      //router();
+      //window.onNavigate(ROUTES_PATH.NewBill);
+      
+      document.body.innerHTML = NewBillUI();
       const newBill = new NewBill({ document, onNavigate, store: mockStore, localStorage: window.localStorage });
       const form = screen.getByTestId('form-new-bill');
       const submitBtn = document.getElementById('btn-send-bill');
 
       // simulation de la fonction bills
       jest.spyOn(mockStore, 'bills');
+      // const mockStore = jest.fn(() => mockStore.bills());
+      // remplacement de la méthode 'bills' de l'ojet 'mockStore' par une implémentation personnalisée
+      // cette implémentation sera utillisée sur lors du premier appel à la méthode 'bills'
+      mockStore.bills(() => {
+        return mockedBills
+      })
       newBill.updateBill = jest.fn();
 
       const mockedBill = {
-        email: "employee@test.tld",
-        type: "Restaurants et bars",
-        name: "ELEMENT DE TEST",
-        amount: 1,
-        date: "2023-06-05",
-        vat: "1",
-        pct: 1,
-        commentary: "ELEMENT DE TEST",
-        fileUrl: "./Capture.PNG",
-        fileName: "Capture.PNG",
+        name: "Vol Paris Marseille",
+        type: "Transports",
+        email: undefined,
+        date: "2021-11-22",
+        vat: "40",
+        pct: 20,
+        commentary: "Vol pour la vente de consommables",
+        fileName: "bill-abcde.jpg",
+        amount: 240,
+        fileUrl: "./bill-abcde.jpg",
         status: "pending"
-      }
+    }
 
       screen.getByTestId('expense-type').value = mockedBill.type;
       screen.getByTestId('expense-name').value = mockedBill.name;
@@ -180,7 +194,7 @@ describe("GIVEN I CONNECTED AS EMPLOYEE ON NEWBILL PAGE", () => {
       // Action: soumission du formulaire
       const handleSubmit = jest.fn((e) => newBill.handleSubmit(e));
       // await waitForElementVisible(form);
-      form.addEventListener('submit', (e) => newBill.handleSubmit(e));
+      form.addEventListener('submit', handleSubmit);
       userEvent.click(submitBtn);
 
       // assertions 1 : s'assurer que les fonctions sont appelées
@@ -188,7 +202,6 @@ describe("GIVEN I CONNECTED AS EMPLOYEE ON NEWBILL PAGE", () => {
       expect(newBill.updateBill).toHaveBeenCalled();
       expect(newBill.updateBill).toHaveBeenCalledWith( mockedBill );
       expect(mockStore.bills).toHaveBeenCalled();
-      expect(form).toBeInTheDocument();
 
       // assertion 2: s'assurer qu'on soit retourné a la page Bills
       expect(screen.getByText('Mes notes de frais')).toBeTruthy();

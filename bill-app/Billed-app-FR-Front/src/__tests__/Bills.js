@@ -29,7 +29,7 @@ describe("Given I am connected as an employee", () => {
     
     test("Then bill icon in vertical layout should be highlighted", async () => {
      // document.body.innerHTML = BillsUI({ data: bills });
-     // const billsContainer = new Bills({ document, onNavigate, localStorage: window.localStorage });
+     const billsContainer = new Bills({ document, onNavigate, localStorage: window.localStorage });
 
      const root = document.createElement("div")
      root.setAttribute("id", "root")
@@ -42,8 +42,15 @@ describe("Given I am connected as an employee", () => {
       // Assertion
       await waitFor(() => screen.getByTestId('icon-window'))
       const windowIcon = screen.getByTestId('icon-window')
+      // const errorMessage = await waitFor( () => screen.getByTestId('btn-new-bill-error'));
+      // const errorMessageText = await waitFor( () => screen.getByText("Le boutton Nouvelle note de frais est abscent"));
+      
+      // const errorMT = jest.fn(Bills.errorMT);
       //to-do write expect expression
       expect(windowIcon).toHaveClass('active-icon')
+      // expect(errorMessageText).toBeVisible()
+      // expect(errorMessage).toBeTruthy()
+      // expect(errorMT).toHaveBeenCalled()
 
     })
 
