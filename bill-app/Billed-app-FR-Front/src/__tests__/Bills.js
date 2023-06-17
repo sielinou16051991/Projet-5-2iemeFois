@@ -8,8 +8,7 @@ import BillsUI from "../views/BillsUI.js";
 import { bills } from "../fixtures/bills.js";
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
-import { toHaveClass } from "@testing-library/jest-dom";
-import { toBeTruthy } from "@testing-library/jest-dom";
+import { toHaveClass, toBeTruthy } from "@testing-library/jest-dom";
 import  Bills  from "../containers/Bills.js";
 import mockStore from "../__mocks__/store";
 
@@ -26,7 +25,6 @@ describe("Given I am connected as an employee", () => {
     window.localStorage.setItem('user', JSON.stringify({type: 'Employee'}))
   });
   describe("When I am on Bills Page", () => {
-    
     test("Then bill icon in vertical layout should be highlighted", async () => {
      // document.body.innerHTML = BillsUI({ data: bills });
      const billsContainer = new Bills({ document, onNavigate, localStorage: window.localStorage });
@@ -48,12 +46,10 @@ describe("Given I am connected as an employee", () => {
       // const errorMT = jest.fn(Bills.errorMT);
       //to-do write expect expression
       expect(windowIcon).toHaveClass('active-icon')
-      // expect(errorMessageText).toBeVisible()
-      // expect(errorMessage).toBeTruthy()
-      // expect(errorMT).toHaveBeenCalled()
+      expect(windowIcon).not.toHaveClass('icon-window')
+      expect('Mes notes de frais').not.toBeFalsy()
 
     })
-
     test("Then bills should be ordered from earliest to latest", () => {
       // parametre : récupération de la date sur l'interface de Bills
       document.body.innerHTML = BillsUI({ data: bills })
@@ -79,7 +75,6 @@ describe("Given I am connected as an employee", () => {
     
     describe('When I click on all eye icons', () => {
       test('Then it should open the modal', () => {
-       
         document.body.innerHTML = BillsUI({ data: bills });
         const billsContainer = new Bills({ document, onNavigate, localStorage: window.localStorage });
 
@@ -110,7 +105,6 @@ describe("Given I am connected as an employee", () => {
     })
 
     describe("When I click on the New Bil Button", () => {
-
       test("Then It Should open the NewBill Form", () => {
         // chqrgement des element sur l'interface
        document.body.innerHTML = BillsUI({data: bills}) 

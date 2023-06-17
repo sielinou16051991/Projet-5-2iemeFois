@@ -20,9 +20,10 @@ export default class {
       // errorMessageFile.style.color = "red";
 
       const cible = document.getElementsByClassName('content-header');
+      console.log(cible);
       const errorMessage = document.createElement('div');
       errorMessage.textContent = 'Le boutton Nouvelle note de frais est abscent';
-      errorMessage.ClassList.add('visible', true);
+      errorMessage.classList.add('visible', true);
       cible.appendChild(errorMessage);
 
     }
