@@ -146,22 +146,21 @@ describe("GIVEN I CONNECTED AS EMPLOYEE ON NEWBILL PAGE", () => {
   describe("when I click on the submit button and API working", () => {
     test("Then it should send and Mock POST request and return to the bill page", async () => {
 
-      //const root = document.createElement('div');
-      //root.setAttribute('id', 'root');
-      //document.body.append(root);
-      //router();
-      //window.onNavigate(ROUTES_PATH.NewBill);
+      const root = document.createElement('div');
+      root.setAttribute('id', 'root');
+      document.body.append(root);
+      router();
       
-      document.body.innerHTML = NewBillUI();
+      // navigation vers la page de creation d'une nouvelle facture
+      window.onNavigate(ROUTES_PATH.NewBill);
+      
+      // document.body.innerHTML = NewBillUI();
       const newBill = new NewBill({ document, onNavigate, store: mockStore, localStorage: window.localStorage });
       const form = screen.getByTestId('form-new-bill');
       const submitBtn = document.getElementById('btn-send-bill');
 
       // simulation de la fonction bills
       jest.spyOn(mockStore, 'bills');
-      // const mockStore = jest.fn(() => mockStore.bills());
-      // remplacement de la méthode 'bills' de l'ojet 'mockStore' par une implémentation personnalisée
-      // cette implémentation sera utillisée sur lors du premier appel à la méthode 'bills'
       mockStore.bills(() => {
         return mockedBills
       })
@@ -193,9 +192,11 @@ describe("GIVEN I CONNECTED AS EMPLOYEE ON NEWBILL PAGE", () => {
 
       // Action: soumission du formulaire
       const handleSubmit = jest.fn((e) => newBill.handleSubmit(e));
-      // await waitForElementVisible(form);
       form.addEventListener('submit', handleSubmit);
       userEvent.click(submitBtn);
+
+      // Act: simple navigation: retour a la page de listing des factures
+      window.onNavigate(ROUTES_PATH.Bills);
 
       // assertions 1 : s'assurer que les fonctions sont appelées
       expect(handleSubmit).toHaveBeenCalled();

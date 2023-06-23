@@ -105,7 +105,7 @@ describe("Given I am connected as an employee", () => {
     })
 
     describe("When I click on the New Bil Button", () => {
-      test("Then It Should open the NewBill Form", () => {
+      test("Then It Should open the NewBill Form", async () => {
         // chqrgement des element sur l'interface
        document.body.innerHTML = BillsUI({data: bills}) 
        const billContainer = new Bills({document, onNavigate, localStorage: window.localStorage});
@@ -117,6 +117,17 @@ describe("Given I am connected as an employee", () => {
        // Act
        btnNewBill.addEventListener("click", functionOpenNewBill);
        userEvent.click(btnNewBill);
+
+       const root = document.createElement('div');
+       root.setAttribute('id', 'root');
+       document.body.append(root);
+       router();
+       
+       window.onNavigate(ROUTES_PATH.Bills)
+       await waitFor(() => screen.getByText('Mes notes de frais'));
+      expect(screen.getByText('Mes notes de frais')).toBeTruthy();
+      const chargementFactures = await billContainer.getBills();
+      expect(chargementFactures).not.toBeNull();
 
        // Assertions
        expect(functionOpenNewBill).toHaveBeenCalled();
