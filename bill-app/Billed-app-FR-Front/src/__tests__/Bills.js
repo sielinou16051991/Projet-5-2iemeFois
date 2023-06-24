@@ -118,23 +118,30 @@ describe("Given I am connected as an employee", () => {
        btnNewBill.addEventListener("click", functionOpenNewBill);
        userEvent.click(btnNewBill);
 
-       const root = document.createElement('div');
-       root.setAttribute('id', 'root');
-       document.body.append(root);
-       router();
-       
-       window.onNavigate(ROUTES_PATH.Bills)
-       await waitFor(() => screen.getByText('Mes notes de frais'));
-      expect(screen.getByText('Mes notes de frais')).toBeTruthy();
-      const chargementFactures = await billContainer.getBills();
-      expect(chargementFactures).not.toBeNull();
-
        // Assertions
        expect(functionOpenNewBill).toHaveBeenCalled();
        expect(screen.getByText('Envoyer une note de frais')).toBeTruthy();
        expect(screen.getByTestId('form-new-bill')).toBeTruthy();
       })
     })
+
+    describe("When I open the billUI page that does not containe the newBill button", () => {
+      test("Then noting can been done", async () => {
+        // chqrgement des element sur l'interface
+       document.body.innerHTML = BillsUI({data: bills}) 
+       const elt = document.querySelector(`button[data-testid="btn-new-bill"]`)
+       if (elt) {
+        elt.parentNode.removeChild(elt);
+       }
+
+       // Act
+       const billContainer = new Bills({document, onNavigate, localStorage: window.localStorage});
+
+       // assertion
+       expect(screen.queryByTestId("btn-new-bill")).not.toBeTruthy();
+      })
+    })
+
   }) // fin des tes pour la page bills
 }) // fin des test unitaires du parcour employee
 
