@@ -74,6 +74,7 @@ export default class {
               }
             }
           })
+          console.log('bills', bills);
         return bills
       })
     }
